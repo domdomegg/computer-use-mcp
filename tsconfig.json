@@ -1,0 +1,6 @@
+{
+  "extends": ["@tsconfig/node-lts/tsconfig.json", "tsconfig-domdomegg/tsconfig.json"],
+  "include": [
+    "src/**/*"
+  ],
+}
