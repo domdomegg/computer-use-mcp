@@ -14,6 +14,7 @@
     "dist"
   ],
   "scripts": {
+    "start": "npm run build && node dist/index.mjs",
     "test": "vitest run",
     "test:watch": "vitest --watch",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx .",
@@ -33,5 +34,11 @@
     "extends": [
       "eslint-config-domdomegg"
     ]
+  },
+  "dependencies": {
+    "@nut-tree-fork/nut-js": "^4.2.4",
+    "@types/node": "^22.10.5",
+    "fastmcp": "^1.16.1",
+    "zod": "^3.24.1"
   }
 }
