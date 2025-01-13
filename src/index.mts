@@ -9,6 +9,8 @@ import {
   Button,
   imageToJimp,
 } from '@nut-tree-fork/nut-js';
+import { setTimeout } from 'node:timers/promises';
+import imageminPngquant from 'imagemin-pngquant';
 // eslint-disable-next-line import/extensions, import/no-unresolved
 import { toKeys } from './xdotoolStringToKeys.mjs';
 
@@ -61,6 +63,8 @@ server.addTool({
   name: 'computer',
   description: `Use a mouse and keyboard to interact with a computer, and take screenshots.
 * This is an interface to a desktop GUI. You do not have access to a terminal or applications menu. You must click on desktop icons to start applications.
+* Always prefer using keyboard shortcuts rather than clicking, where possible.
+* If you see boxes with two letters in them, typing these letters will click that element. Use this instead of other shortcuts or clicking, where possible.
 * Some applications may take time to start or process actions, so you may need to wait and take successive screenshots to see the results of your actions. E.g. if you click on Firefox and a window doesn't open, try taking another screenshot.
 * Whenever you intend to move the cursor to click on an element like an icon, you should consult a screenshot to determine the coordinates of the element before moving the cursor.
 * If you tried clicking on a program or link but it failed to load, even after waiting, try adjusting your cursor position so that the tip of the cursor visually falls on the element that you want to click.
@@ -144,9 +148,14 @@ server.addTool({
         };
 
       case 'get_screenshot': {
+        // Wait a couple of seconds - helps to let things load before showing it to Claude
+        await setTimeout(1000);
+
         // Capture the entire screen
         const image = await imageToJimp(await screen.grab());
         const [originalWidth, originalHeight] = [image.getWidth(), image.getHeight()];
+
+        // Resize if high definition, to fit size limits
         if (originalWidth * originalHeight > 1366 * 768) {
           const scaleFactor = Math.sqrt((1366 * 768) / (originalWidth * originalHeight));
           const newWidth = Math.floor(originalWidth * scaleFactor);
@@ -154,11 +163,15 @@ server.addTool({
           // console.warn(`Image too large (${originalWidth}x${originalHeight}), resizing to ${newWidth}x${newHeight}`);
           image.resize(newWidth, newHeight);
         }
-        const dataUri = await image.getBase64Async('image/png');
-        const base64Data = dataUri.split(',').pop(); // removes 'data:image/png;base64,' prefix
-        if (!base64Data) {
-          throw new Error(`Failed to capture screenshot: bad dataUri (${dataUri})`);
-        }
+
+        // Get PNG buffer from Jimp
+        const pngBuffer = await image.getBufferAsync('image/png');
+
+        // Compress PNG using imagemin, to fit size limits
+        const optimizedBuffer = await imageminPngquant()(new Uint8Array(pngBuffer));
+
+        // Convert optimized buffer to base64
+        const base64Data = Buffer.from(optimizedBuffer).toString('base64');
 
         return {
           content: [
