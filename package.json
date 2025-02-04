@@ -1,6 +1,6 @@
 {
   "name": "computer-use-mcp",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "description": "💻 MCP server for Claude to control your computer",
   "license": "MIT",
