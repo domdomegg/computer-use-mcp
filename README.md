@@ -1,25 +1,39 @@
-# typescript-library-template
+# computer-use-mcp
 
-Personal template for creating TypeScript libraries.
+💻 An model context protocol server for Claude to control your computer. This is very similar to [computer use](https://docs.anthropic.com/en/docs/build-with-claude/computer-use), but easy to set up and use locally.
 
-## Quick start
+<!-- TODO: demo video -->
 
-1. If it should be published to NPM, add the `NPM_TOKEN` secret (make sure not to leave a trailing newline in there!). Otherwise, add `"private": true` in `package.json`.
-2. Update the package name, description and repo URL in `package.json`
-3. Enable 'Allow GitHub Actions to create and approve pull requests' in _Settings > Actions (General) > `Workflow permissions_
-4. Set protection on the master branch: require a pull request before merging, require reivew from code owners, require status checks to pass (select both ci options)
-5. Add the repo to the [file sync automation rules](https://github.com/domdomegg/domdomegg/blob/master/.github/workflows/repo-file-sync.yaml)
-6. Update the README, using the template commented out below
+To get best results:
+- Install and enable the [Rango browser extension](https://chromewebstore.google.com/detail/rango/lnemjdnjjofijemhdogofbpcedhgcpmb). This enables keyboard navigation for websites, which is far more reliable than Claude trying to click coordinates.
+- On high resolution displays, consider zooming in to active windows. You can also bump up the font size setting in Rango to make the text more visible.
 
-<!--
+> [!WARNING]
+> At time of writing, models make frequent mistakes and are vulnerable to prompt injections. As this MCP server gives the model complete control of your computer, this could do a lot of damage. You should therefore treat this like giving a hyperactive toddler access to your computer - you probably want to supervise it closely, and consider only doing this in a sandboxed user account.
 
-# TODO: name of library
+## How it works
 
-TODO: A short description of what the library does, explaining why people might want to use it.
+We implement a near identical computer use tool to [Anthropic's official computer use guide](https://docs.anthropic.com/en/docs/build-with-claude/computer-use), with some more nudging to prefer keyboard shortcuts.
+
+This talks to your computer using [nut.js](https://github.com/nut-tree/nut.js).
 
 ## Usage
 
-TODO: usage instructions
+To use this server with the Claude Desktop app, add the following configuration to the "mcpServers" section of your `claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "computer-use": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "computer-use-mcp"
+      ]
+    }
+  }
+}
+```
 
 ## Contributing
 
@@ -40,5 +54,3 @@ To release:
 1. Use `npm version <major | minor | patch>` to bump the version
 2. Run `git push --follow-tags` to push with tags
 3. Wait for GitHub Actions to publish to the NPM registry.
-
--->

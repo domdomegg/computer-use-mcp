@@ -1,12 +1,13 @@
 {
-  "name": "typescript-library-template",
+  "name": "computer-use-mcp",
   "version": "0.0.0",
-  "description": "Template for creating TypeScript libraries",
+  "type": "module",
+  "description": "💻 MCP server for Claude to control your computer",
   "license": "MIT",
   "author": "Adam Jones (domdomegg)",
   "repository": {
     "type": "git",
-    "url": "https://github.com/domdomegg/typescript-library-template.git"
+    "url": "https://github.com/domdomegg/computer-use-mcp.git"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -14,7 +15,7 @@
     "dist"
   ],
   "scripts": {
-    "start": "npm run build && node dist/index.mjs",
+    "start": "npm run build && node dist/index.js",
     "test": "vitest run",
     "test:watch": "vitest --watch",
     "lint": "eslint",

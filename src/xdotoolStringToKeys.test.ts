@@ -1,6 +1,6 @@
 import {describe, it, expect} from 'vitest';
 import {Key} from '@nut-tree-fork/nut-js';
-import {toKeys, InvalidKeyError} from './xdotoolStringToKeys.mjs';
+import {toKeys, InvalidKeyError} from './xdotoolStringToKeys.js';
 
 describe('toKeys', () => {
 	it('should convert single keys', () => {

@@ -11,7 +11,7 @@ import {
 } from '@nut-tree-fork/nut-js';
 import {setTimeout} from 'node:timers/promises';
 import imageminPngquant from 'imagemin-pngquant';
-import {toKeys} from './xdotoolStringToKeys.mjs';
+import {toKeys} from './xdotoolStringToKeys.js';
 
 // Configure nut-js
 mouse.config.autoDelayMs = 100;
