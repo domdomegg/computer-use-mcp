@@ -16,9 +16,9 @@ jobs:
       CI: true
     steps:
       - name: Checkout ${{ github.sha }}
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           registry-url: https://registry.npmjs.org/
@@ -39,9 +39,9 @@ jobs:
       CI: true
     steps:
       - name: Checkout ${{ github.sha }}
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Use Node.js with the npmjs.org registry
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: lts/*
           registry-url: https://registry.npmjs.org/
