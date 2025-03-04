@@ -19,7 +19,7 @@ permissions:
 
 jobs:
   dependabot_automation:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     timeout-minutes: 10
     if: ${{ github.actor == 'dependabot[bot]' }}
     steps:
