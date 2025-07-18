@@ -21,7 +21,7 @@ jobs:
   dependabot_automation:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    if: ${{ github.actor == 'dependabot[bot]' }}
+    if: ${{ github.actor == 'dependabot[bot]' && github.event.pull_request.head.repo.full_name == github.repository}}
     steps:
       - name: Approve
         run: gh pr review --approve "$PR_URL"
