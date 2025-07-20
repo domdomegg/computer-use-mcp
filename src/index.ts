@@ -55,7 +55,6 @@ const computerToolParams = z.object({
 	text: z.string().optional(),
 });
 
-// Define the computer tool
 const computerTool: Tool = {
 	name: 'computer',
 	description: `Use a mouse and keyboard to interact with a computer, and take screenshots.
@@ -274,12 +273,11 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 	}
 });
 
-// Error handling
+// Handle graceful shutdown
 process.on('SIGINT', async () => {
 	await server.close();
 	process.exit(0);
 });
-
 process.on('SIGTERM', async () => {
 	await server.close();
 	process.exit(0);
