@@ -33,10 +33,10 @@
     "vitest": "^3.0.5"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.16.0",
     "@nut-tree-fork/nut-js": "^4.2.4",
     "@types/node": "^22.10.5",
-    "fastmcp": "^1.16.1",
-    "imagemin": "^9.0.0",
+    "imagemin": "^9.0.1",
     "imagemin-pngquant": "^10.0.0",
     "zod": "^3.24.1"
   }
