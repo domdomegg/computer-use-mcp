@@ -17,9 +17,30 @@ We implement a near identical computer use tool to [Anthropic's official compute
 
 This talks to your computer using [nut.js](https://github.com/nut-tree/nut.js).
 
-## Usage
+## Installation
 
-To use this server with the Claude Desktop app, add the following configuration to the "mcpServers" section of your `claude_desktop_config.json`:
+Follow the instructions below for your preferred client:
+
+- [Claude Desktop](#claude-desktop)
+- [Cursor](#cursor)
+- [Cline](#cline)
+
+### Claude Desktop
+
+#### (Recommended) Via manual .dxt installation
+
+1. Find the latest dxt build in [the GitHub Actions history](https://github.com/domdomegg/computer-use-mcp/actions/workflows/dxt.yaml?query=branch%3Amaster) (the top one)
+2. In the 'Artifacts' section, download the `computer-use-mcp-dxt` file
+3. Rename the `.zip` file to `.dxt`
+4. Double-click the `.dxt` file to open with Claude Desktop
+5. Click "Install"
+
+#### (Advanced) Alternative: Via JSON configuration
+
+1. Install [Node.js](https://nodejs.org/en/download)
+2. Open Claude Desktop and go to Settings → Developer
+3. Click "Edit Config" to open your `claude_desktop_config.json` file
+4. Add the following configuration to the "mcpServers" section:
 
 ```json
 {
@@ -30,6 +51,55 @@ To use this server with the Claude Desktop app, add the following configuration 
         "-y",
         "computer-use-mcp"
       ]
+    }
+  }
+}
+```
+
+5. Save the file and restart Claude Desktop
+
+### Cursor
+
+#### (Recommended) Via one-click install
+
+1. Click [![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/install-mcp?name=computer-use&config=JTdCJTIyY29tbWFuZCUyMiUzQSUyMm5weCUyMC15JTIwY29tcHV0ZXItdXNlLW1jcCUyMiU3RA%3D%3D)
+
+#### (Advanced) Alternative: Via JSON configuration
+
+Create either a global (`~/.cursor/mcp.json`) or project-specific (`.cursor/mcp.json`) configuration file:
+
+```json
+{
+  "mcpServers": {
+    "computer-use": {
+      "command": "npx",
+      "args": ["-y", "computer-use-mcp"]
+    }
+  }
+}
+```
+
+### Cline
+
+#### (Recommended) Via marketplace
+
+1. Click the "MCP Servers" icon in the Cline extension
+2. Search for "Computer Use" and click "Install"
+3. Follow the prompts to install the server
+
+#### (Advanced) Alternative: Via JSON configuration
+
+1. Click the "MCP Servers" icon in the Cline extension
+2. Click on the "Installed" tab, then the "Configure MCP Servers" button at the bottom
+3. Add the following configuration to the "mcpServers" section:
+
+```json
+{
+  "mcpServers": {
+    "computer-use": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "computer-use-mcp"]
     }
   }
 }
