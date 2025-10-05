@@ -33,10 +33,7 @@ jobs:
       
       - name: Build TypeScript
         run: npm run build
-      
-      - name: Install DXT CLI
-        run: npm install -g @anthropic-ai/dxt
-      
+
       - name: Build DXT package
         run: |
           chmod +x build-dxt.sh
