@@ -14,7 +14,7 @@ import {
 	imageToJimp,
 } from '@nut-tree-fork/nut-js';
 import {setTimeout} from 'node:timers/promises';
-import imageminPngquant from 'imagemin-pngquant';
+import sharp from 'sharp';
 import {toKeys} from './xdotoolStringToKeys.js';
 
 // Configure nut-js
@@ -257,11 +257,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 			// Get PNG buffer from Jimp
 			const pngBuffer = await image.getBufferAsync('image/png');
 
-			// Compress PNG using imagemin, to fit size limits
-			const optimizedBuffer = await imageminPngquant()(new Uint8Array(pngBuffer));
+			// Compress PNG using sharp, to fit size limits
+			const optimizedBuffer = await sharp(pngBuffer)
+				.png({quality: 80, compressionLevel: 9})
+				.toBuffer();
 
 			// Convert optimized buffer to base64
-			const base64Data = Buffer.from(optimizedBuffer).toString('base64');
+			const base64Data = optimizedBuffer.toString('base64');
 
 			return {
 				content: [
