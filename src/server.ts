@@ -246,16 +246,64 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 			const logicalWidth = await screen.width();
 			const logicalHeight = await screen.height();
 
+			// Get cursor position in logical coordinates
+			const cursorPos = await mouse.getPosition();
+
 			// Capture the entire screen (may be at Retina resolution)
 			const image = imageToJimp(await screen.grab());
 			const [capturedWidth, capturedHeight] = [image.getWidth(), image.getHeight()];
 
+			// Calculate scale from captured to logical (for cursor positioning)
+			const captureToLogicalScale = logicalWidth / capturedWidth;
+
 			// Resize if high definition, to fit size limits
+			let imageScaleFactor = 1;
 			if (capturedWidth * capturedHeight > 1366 * 768) {
-				const scaleFactor = Math.sqrt((1366 * 768) / (capturedWidth * capturedHeight));
-				const newWidth = Math.floor(capturedWidth * scaleFactor);
-				const newHeight = Math.floor(capturedHeight * scaleFactor);
+				imageScaleFactor = Math.sqrt((1366 * 768) / (capturedWidth * capturedHeight));
+				const newWidth = Math.floor(capturedWidth * imageScaleFactor);
+				const newHeight = Math.floor(capturedHeight * imageScaleFactor);
 				image.resize(newWidth, newHeight);
+			}
+
+			// Calculate cursor position in the resized image coordinates
+			// cursor logical -> cursor in captured -> cursor in resized image
+			const cursorInImageX = Math.floor((cursorPos.x / captureToLogicalScale) * imageScaleFactor);
+			const cursorInImageY = Math.floor((cursorPos.y / captureToLogicalScale) * imageScaleFactor);
+
+			// Draw a crosshair at cursor position (red color)
+			const crosshairSize = 20;
+			const crosshairColor = 0xFF0000FF; // Red with full opacity (RGBA)
+			const imageWidth = image.getWidth();
+			const imageHeight = image.getHeight();
+
+			// Draw horizontal line
+			for (let x = Math.max(0, cursorInImageX - crosshairSize); x <= Math.min(imageWidth - 1, cursorInImageX + crosshairSize); x++) {
+				if (cursorInImageY >= 0 && cursorInImageY < imageHeight) {
+					image.setPixelColor(crosshairColor, x, cursorInImageY);
+					// Make it thicker
+					if (cursorInImageY > 0) {
+						image.setPixelColor(crosshairColor, x, cursorInImageY - 1);
+					}
+
+					if (cursorInImageY < imageHeight - 1) {
+						image.setPixelColor(crosshairColor, x, cursorInImageY + 1);
+					}
+				}
+			}
+
+			// Draw vertical line
+			for (let y = Math.max(0, cursorInImageY - crosshairSize); y <= Math.min(imageHeight - 1, cursorInImageY + crosshairSize); y++) {
+				if (cursorInImageX >= 0 && cursorInImageX < imageWidth) {
+					image.setPixelColor(crosshairColor, cursorInImageX, y);
+					// Make it thicker
+					if (cursorInImageX > 0) {
+						image.setPixelColor(crosshairColor, cursorInImageX - 1, y);
+					}
+
+					if (cursorInImageX < imageWidth - 1) {
+						image.setPixelColor(crosshairColor, cursorInImageX + 1, y);
+					}
+				}
 			}
 
 			// Get PNG buffer from Jimp
