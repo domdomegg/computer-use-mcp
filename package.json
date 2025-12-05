@@ -29,18 +29,16 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.17.1",
     "@nut-tree-fork/nut-js": "^4.2.4",
-    "imagemin": "^9.0.1",
-    "imagemin-pngquant": "^10.0.0",
-    "zod": "^3.24.1"
+    "sharp": "^0.34.5",
+    "zod": "^4.1.13"
   },
   "devDependencies": {
-    "@tsconfig/node-lts": "^22.0.2",
-    "@types/imagemin": "^9.0.0",
-    "@types/node": "^22.10.2",
+    "@tsconfig/node-lts": "^24.0.0",
+    "@types/node": "^24.10.1",
     "eslint": "^9.32.0",
     "eslint-config-domdomegg": "^2.0.9",
     "tsconfig-domdomegg": "^1.0.0",
     "typescript": "^5.8.3",
-    "vitest": "^3.2.4"
+    "vitest": "^4.0.15"
   }
 }

@@ -14,7 +14,7 @@ import {
 	imageToJimp,
 } from '@nut-tree-fork/nut-js';
 import {setTimeout} from 'node:timers/promises';
-import imageminPngquant from 'imagemin-pngquant';
+import sharp from 'sharp';
 import {toKeys} from './xdotoolStringToKeys.js';
 
 // Configure nut-js
@@ -239,37 +239,90 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 		}
 
 		case 'get_screenshot': {
-			// Wait a couple of seconds - helps to let things load before showing it to Claude
+			// Wait a bit to let things load before showing it to Claude
 			await setTimeout(1000);
 
-			// Capture the entire screen
+			// Get logical screen dimensions (what mouse coordinates use)
+			const logicalWidth = await screen.width();
+			const logicalHeight = await screen.height();
+
+			// Get cursor position in logical coordinates
+			const cursorPos = await mouse.getPosition();
+
+			// Capture the entire screen (may be at Retina resolution)
 			const image = imageToJimp(await screen.grab());
-			const [originalWidth, originalHeight] = [image.getWidth(), image.getHeight()];
+			const [capturedWidth, capturedHeight] = [image.getWidth(), image.getHeight()];
+
+			// Calculate scale from captured to logical (for cursor positioning)
+			const captureToLogicalScale = logicalWidth / capturedWidth;
 
 			// Resize if high definition, to fit size limits
-			if (originalWidth * originalHeight > 1366 * 768) {
-				const scaleFactor = Math.sqrt((1366 * 768) / (originalWidth * originalHeight));
-				const newWidth = Math.floor(originalWidth * scaleFactor);
-				const newHeight = Math.floor(originalHeight * scaleFactor);
+			let imageScaleFactor = 1;
+			if (capturedWidth * capturedHeight > 1366 * 768) {
+				imageScaleFactor = Math.sqrt((1366 * 768) / (capturedWidth * capturedHeight));
+				const newWidth = Math.floor(capturedWidth * imageScaleFactor);
+				const newHeight = Math.floor(capturedHeight * imageScaleFactor);
 				image.resize(newWidth, newHeight);
+			}
+
+			// Calculate cursor position in the resized image coordinates
+			// cursor logical -> cursor in captured -> cursor in resized image
+			const cursorInImageX = Math.floor((cursorPos.x / captureToLogicalScale) * imageScaleFactor);
+			const cursorInImageY = Math.floor((cursorPos.y / captureToLogicalScale) * imageScaleFactor);
+
+			// Draw a crosshair at cursor position (red color)
+			const crosshairSize = 20;
+			const crosshairColor = 0xFF0000FF; // Red with full opacity (RGBA)
+			const imageWidth = image.getWidth();
+			const imageHeight = image.getHeight();
+
+			// Draw horizontal line
+			for (let x = Math.max(0, cursorInImageX - crosshairSize); x <= Math.min(imageWidth - 1, cursorInImageX + crosshairSize); x++) {
+				if (cursorInImageY >= 0 && cursorInImageY < imageHeight) {
+					image.setPixelColor(crosshairColor, x, cursorInImageY);
+					// Make it thicker
+					if (cursorInImageY > 0) {
+						image.setPixelColor(crosshairColor, x, cursorInImageY - 1);
+					}
+					if (cursorInImageY < imageHeight - 1) {
+						image.setPixelColor(crosshairColor, x, cursorInImageY + 1);
+					}
+				}
+			}
+
+			// Draw vertical line
+			for (let y = Math.max(0, cursorInImageY - crosshairSize); y <= Math.min(imageHeight - 1, cursorInImageY + crosshairSize); y++) {
+				if (cursorInImageX >= 0 && cursorInImageX < imageWidth) {
+					image.setPixelColor(crosshairColor, cursorInImageX, y);
+					// Make it thicker
+					if (cursorInImageX > 0) {
+						image.setPixelColor(crosshairColor, cursorInImageX - 1, y);
+					}
+					if (cursorInImageX < imageWidth - 1) {
+						image.setPixelColor(crosshairColor, cursorInImageX + 1, y);
+					}
+				}
 			}
 
 			// Get PNG buffer from Jimp
 			const pngBuffer = await image.getBufferAsync('image/png');
 
-			// Compress PNG using imagemin, to fit size limits
-			const optimizedBuffer = await imageminPngquant()(new Uint8Array(pngBuffer));
+			// Compress PNG using sharp, to fit size limits
+			const optimizedBuffer = await sharp(pngBuffer)
+				.png({quality: 80, compressionLevel: 9})
+				.toBuffer();
 
 			// Convert optimized buffer to base64
-			const base64Data = Buffer.from(optimizedBuffer).toString('base64');
+			const base64Data = optimizedBuffer.toString('base64');
 
 			return {
 				content: [
 					{
 						type: 'text',
 						text: JSON.stringify({
-							display_width_px: originalWidth,
-							display_height_px: originalHeight,
+							// Report logical dimensions - these match mouse coordinate space
+							display_width_px: logicalWidth,
+							display_height_px: logicalHeight,
 						}),
 					},
 					{
