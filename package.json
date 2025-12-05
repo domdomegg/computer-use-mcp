@@ -27,18 +27,18 @@
     "prepublishOnly": "npm run clean && npm run build"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.17.1",
-    "@nut-tree-fork/nut-js": "^4.2.4",
+    "@modelcontextprotocol/sdk": "^1.24.3",
+    "@nut-tree-fork/nut-js": "^4.2.6",
     "sharp": "^0.34.5",
-    "zod": "^3.24.1"
+    "zod": "^4.1.13"
   },
   "devDependencies": {
-    "@tsconfig/node-lts": "^22.0.2",
-    "@types/node": "^22.10.2",
-    "eslint": "^9.32.0",
+    "@tsconfig/node-lts": "^24.0.0",
+    "@types/node": "^24.10.1",
+    "eslint": "^9.39.1",
     "eslint-config-domdomegg": "^2.0.9",
     "tsconfig-domdomegg": "^1.0.0",
-    "typescript": "^5.8.3",
-    "vitest": "^3.2.4"
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.15"
   }
 }
