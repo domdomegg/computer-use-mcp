@@ -239,18 +239,22 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 		}
 
 		case 'get_screenshot': {
-			// Wait a couple of seconds - helps to let things load before showing it to Claude
+			// Wait a bit to let things load before showing it to Claude
 			await setTimeout(1000);
 
-			// Capture the entire screen
+			// Get logical screen dimensions (what mouse coordinates use)
+			const logicalWidth = await screen.width();
+			const logicalHeight = await screen.height();
+
+			// Capture the entire screen (may be at Retina resolution)
 			const image = imageToJimp(await screen.grab());
-			const [originalWidth, originalHeight] = [image.getWidth(), image.getHeight()];
+			const [capturedWidth, capturedHeight] = [image.getWidth(), image.getHeight()];
 
 			// Resize if high definition, to fit size limits
-			if (originalWidth * originalHeight > 1366 * 768) {
-				const scaleFactor = Math.sqrt((1366 * 768) / (originalWidth * originalHeight));
-				const newWidth = Math.floor(originalWidth * scaleFactor);
-				const newHeight = Math.floor(originalHeight * scaleFactor);
+			if (capturedWidth * capturedHeight > 1366 * 768) {
+				const scaleFactor = Math.sqrt((1366 * 768) / (capturedWidth * capturedHeight));
+				const newWidth = Math.floor(capturedWidth * scaleFactor);
+				const newHeight = Math.floor(capturedHeight * scaleFactor);
 				image.resize(newWidth, newHeight);
 			}
 
@@ -268,8 +272,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 					{
 						type: 'text',
 						text: JSON.stringify({
-							display_width_px: originalWidth,
-							display_height_px: originalHeight,
+							// Report logical dimensions - these match mouse coordinate space
+							display_width_px: logicalWidth,
+							display_height_px: logicalHeight,
 						}),
 					},
 					{
