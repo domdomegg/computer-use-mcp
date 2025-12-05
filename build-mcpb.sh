@@ -16,6 +16,15 @@ mv manifest.json.tmp manifest.json
 echo "Removing devDependencies and types from node_modules..."
 rm -rf node_modules
 npm ci --omit=dev --audit false --fund false
+
+# Install all sharp platform binaries for cross-platform support
+# (sharp uses optional deps that only install for current platform)
+# --force is needed to bypass platform checks for non-native packages
+echo "Installing cross-platform sharp binaries..."
+npm install --no-save --force --audit false --fund false \
+  @img/sharp-darwin-arm64 @img/sharp-darwin-x64 \
+  @img/sharp-linux-x64 @img/sharp-win32-x64
+
 find node_modules -name "*.ts" -type f -delete 2>/dev/null || true
 
 # Create the MCPB package
