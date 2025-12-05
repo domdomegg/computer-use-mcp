@@ -23,6 +23,7 @@ mouse.config.mouseSpeed = 1000;
 keyboard.config.autoDelayMs = 10;
 
 // Create the server
+// eslint-disable-next-line @typescript-eslint/no-deprecated -- TODO: migrate to McpServer
 export const server = new Server({
 	name: 'computer-use-mcp',
 	version: '1.0.0',
