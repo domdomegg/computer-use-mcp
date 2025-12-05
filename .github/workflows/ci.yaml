@@ -1,6 +1,3 @@
-# This file is centrally managed
-# https://github.com/domdomegg/domdomegg/blob/master/file-sync/node-general.yaml
-
 name: CI/CD
 
 on:
@@ -35,12 +32,27 @@ jobs:
         run: npm run build --if-present
       - name: Test
         run: npm run test --if-present
+      - name: Prepare MCPB artifact
+        if: matrix.node-version == 'lts/*'
+        run: |
+          npm run build:mcpb
+          mkdir -p .github/tmp
+          unzip computer-use-mcp.mcpb -d .github/tmp
+      - name: Upload MCPB artifact
+        if: matrix.node-version == 'lts/*'
+        uses: actions/upload-artifact@v4
+        with:
+          name: computer-use-mcp-mcpb
+          path: .github/tmp/*
 
   deploy:
     if: startsWith(github.ref, 'refs/tags/v') && github.event_name == 'push'
     needs: ci
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      id-token: write
     env:
       CI: true
     steps:
@@ -55,7 +67,29 @@ jobs:
         run: npm ci
       - name: Build
         run: npm run build --if-present
-      - name: Publish ${{ github.ref }}
+      - name: Build MCPB
+        run: npm run build:mcpb
+      - name: Update server.json version and SHA256
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          MCPB_FILE_SHA256=$(sha256sum computer-use-mcp.mcpb | cut -d' ' -f1)
+          sed "s/{{VERSION}}/$VERSION/g; s/{{MCPB_FILE_SHA256}}/$MCPB_FILE_SHA256/g" server.json > server.json.tmp
+          mv server.json.tmp server.json
+      - name: Publish to NPM
         run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: computer-use-mcp.mcpb
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install MCP Publisher
+        run: |
+          curl -L "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_$(uname -s | tr '[:upper:]' '[:lower:]')_$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/').tar.gz" | tar xz
+      - name: Login to MCP Registry
+        run: ./mcp-publisher login github-oidc
+      - name: Publish to MCP Registry
+        run: ./mcp-publisher publish

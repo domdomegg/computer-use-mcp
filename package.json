@@ -15,6 +15,7 @@
   "files": [
     "dist"
   ],
+  "mcpName": "io.github.domdomegg/computer-use-mcp",
   "scripts": {
     "start": "npm run build && node dist/index.js",
     "test": "vitest run",
@@ -23,7 +24,7 @@
     "lint": "eslint",
     "clean": "rm -rf dist",
     "build": "tsc --project tsconfig.build.json",
-    "build-dxt": "./build-dxt.sh",
+    "build:mcpb": "./build-mcpb.sh",
     "prepublishOnly": "npm run clean && npm run build"
   },
   "dependencies": {

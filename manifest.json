@@ -1,5 +1,5 @@
 {
-  "dxt_version": "0.1",
+  "manifest_version": "0.3",
   "name": "computer-use-mcp",
   "display_name": "Computer Use",
   "version": "{{VERSION}}",
