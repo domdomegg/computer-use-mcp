@@ -29,14 +29,6 @@ npm install --no-save --force --audit false --fund false \
   @img/sharp-linux-x64 @img/sharp-libvips-linux-x64 \
   @img/sharp-win32-x64
 
-# Ad-hoc sign macOS native binaries for Gatekeeper compatibility
-# This ensures binaries work when extracted from the MCPB zip
-if command -v codesign &> /dev/null; then
-  echo "Signing macOS native binaries..."
-  find node_modules -name "*.node" -path "*darwin*" -exec codesign -f -s - {} \; 2>/dev/null || true
-  find node_modules -name "*.dylib" -path "*darwin*" -exec codesign -f -s - {} \; 2>/dev/null || true
-fi
-
 find node_modules -name "*.ts" -type f -delete 2>/dev/null || true
 
 # Create the MCPB package

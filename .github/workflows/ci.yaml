@@ -9,9 +9,7 @@ on:
 
 jobs:
   ci:
-    # Use macOS for MCPB builds to ensure native binaries are properly signed
-    # (codesign is only available on macOS and required for Gatekeeper)
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     timeout-minutes: 10
     strategy:
       matrix:
