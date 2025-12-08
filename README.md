@@ -4,29 +4,13 @@
 
 <!-- TODO: demo video -->
 
-To get best results:
-- Install and enable the [Rango browser extension](https://chromewebstore.google.com/detail/rango/lnemjdnjjofijemhdogofbpcedhgcpmb). This enables keyboard navigation for websites, which is far more reliable than Claude trying to click coordinates.
-- On high resolution displays, consider zooming in to active windows. You can also bump up the font size setting in Rango to make the text more visible.
-
 > [!WARNING]
 > At time of writing, models make frequent mistakes and are vulnerable to prompt injections. As this MCP server gives the model complete control of your computer, this could do a lot of damage. You should therefore treat this like giving a hyperactive toddler access to your computer - you probably want to supervise it closely, and consider only doing this in a sandboxed user account.
 
-## How it works
-
-We implement a near identical computer use tool to [Anthropic's official computer use guide](https://docs.anthropic.com/en/docs/build-with-claude/computer-use), with some more nudging to prefer keyboard shortcuts.
-
-This talks to your computer using [nut.js](https://github.com/nut-tree/nut.js).
-
 ## Installation
 
-Follow the instructions below for your preferred client:
-
-- [Claude Code](#claude-code)
-- [Claude Desktop](#claude-desktop)
-- [Cursor](#cursor)
-- [Cline](#cline)
-
-### Claude Code
+<details>
+<summary><strong>Claude Code</strong></summary>
 
 Run:
 
@@ -36,7 +20,10 @@ claude mcp add --scope user --transport stdio computer-use -- npx -y computer-us
 
 This installs the server at user scope (available in all projects). To install locally (current directory only), omit `--scope user`.
 
-### Claude Desktop
+</details>
+
+<details>
+<summary><strong>Claude Desktop</strong></summary>
 
 #### (Recommended) Via manual .dxt installation
 
@@ -69,7 +56,10 @@ This installs the server at user scope (available in all projects). To install l
 
 5. Save the file and restart Claude Desktop
 
-### Cursor
+</details>
+
+<details>
+<summary><strong>Cursor</strong></summary>
 
 #### (Recommended) Via one-click install
 
@@ -90,7 +80,10 @@ Create either a global (`~/.cursor/mcp.json`) or project-specific (`.cursor/mcp.
 }
 ```
 
-### Cline
+</details>
+
+<details>
+<summary><strong>Cline</strong></summary>
 
 #### (Recommended) Via marketplace
 
@@ -115,6 +108,23 @@ Create either a global (`~/.cursor/mcp.json`) or project-specific (`.cursor/mcp.
   }
 }
 ```
+
+</details>
+
+## Tips
+
+This should just work out of the box.
+
+However, to get best results:
+- Use a model good at computer use - I recommend [the latest Claude models](https://platform.claude.com/docs/en/about-claude/models/overview).
+- Use a small, common resolution - 720p works particularly well. On macOS, you can use [displayoverride-mac](https://github.com/domdomegg/displayoverride-mac) to do this. If you can't use a different resolution, try zooming in to active windows.
+- Install and enable the [Rango browser extension](https://chromewebstore.google.com/detail/rango/lnemjdnjjofijemhdogofbpcedhgcpmb). This enables keyboard navigation for websites, which is far more reliable than Claude trying to click coordinates. You can bump up the font size setting in Rango to make the hints more visible.
+
+## How it works
+
+We implement a near identical computer use tool to [Anthropic's official computer use guide](https://docs.anthropic.com/en/docs/build-with-claude/computer-use), with some more nudging to prefer keyboard shortcuts.
+
+This talks to your computer using [nut.js](https://github.com/nut-tree/nut.js)
 
 ## Contributing
 
