@@ -18,6 +18,41 @@ mouse.config.autoDelayMs = 100;
 mouse.config.mouseSpeed = 1000;
 keyboard.config.autoDelayMs = 10;
 
+// The Claude API automatically downsamples images larger than ~1.15MP or 1568px on the long edge.
+// We already downsampled screenshots to fit these limits and reported the original screen
+// dimensions via display_width_px/display_height_px, but Claude wasn't correctly using those
+// reported dimensions - it was using coordinates from the downsampled image space directly.
+// As a workaround, we now report the actual image dimensions and scale Claude's coordinates
+// back up to logical screen coordinates.
+// See: https://docs.anthropic.com/en/docs/build-with-claude/vision#evaluate-image-size
+const maxLongEdge = 1568;
+const maxPixels = 1.15 * 1024 * 1024; // 1.15 megapixels
+
+/**
+ * Calculate the scale factor to downsample an image to fit API limits.
+ * Returns a value <= 1 representing how much to shrink the image.
+ */
+function getSizeToApiScale(width: number, height: number): number {
+	const longEdge = Math.max(width, height);
+	const totalPixels = width * height;
+
+	const longEdgeScale = longEdge > maxLongEdge ? maxLongEdge / longEdge : 1;
+	const pixelScale = totalPixels > maxPixels ? Math.sqrt(maxPixels / totalPixels) : 1;
+
+	return Math.min(longEdgeScale, pixelScale);
+}
+
+/**
+ * Get the scale factor from API image coordinates to logical screen coordinates.
+ * This is the inverse of the downsampling we apply to fit API limits.
+ */
+async function getApiToLogicalScale(): Promise<number> {
+	const logicalWidth = await screen.width();
+	const logicalHeight = await screen.height();
+	const apiScaleFactor = getSizeToApiScale(logicalWidth, logicalHeight);
+	return 1 / apiScaleFactor;
+}
+
 // Define the action enum values
 const ActionEnum = z.enum([
 	'key',
@@ -75,9 +110,17 @@ export function registerComputer(server: McpServer): void {
 			},
 		},
 		async ({action, coordinate, text}) => {
-			// Validate coordinates are within display bounds
+			// Scale coordinates from API image space to logical screen space
+			let scaledCoordinate = coordinate;
 			if (coordinate) {
-				const [x, y] = coordinate;
+				const scale = await getApiToLogicalScale();
+				scaledCoordinate = [
+					Math.round(coordinate[0] * scale),
+					Math.round(coordinate[1] * scale),
+				];
+
+				// Validate coordinates are within display bounds
+				const [x, y] = scaledCoordinate;
 				const [width, height] = [await screen.width(), await screen.height()];
 				if (x < 0 || x >= width || y < 0 || y >= height) {
 					throw new Error(`Coordinates (${x}, ${y}) are outside display bounds of ${width}x${height}`);
@@ -109,21 +152,27 @@ export function registerComputer(server: McpServer): void {
 
 				case 'get_cursor_position': {
 					const pos = await mouse.getPosition();
-					return jsonResult({x: pos.x, y: pos.y});
+					const scale = await getApiToLogicalScale();
+					// Return coordinates in API image space (scaled down from logical)
+					// so Claude can correlate with what it sees in screenshots
+					return jsonResult({
+						x: Math.round(pos.x / scale),
+						y: Math.round(pos.y / scale),
+					});
 				}
 
 				case 'mouse_move': {
-					if (!coordinate) {
+					if (!scaledCoordinate) {
 						throw new Error('Coordinate required for mouse_move');
 					}
 
-					await mouse.setPosition(new Point(coordinate[0], coordinate[1]));
+					await mouse.setPosition(new Point(scaledCoordinate[0], scaledCoordinate[1]));
 					return jsonResult({ok: true});
 				}
 
 				case 'left_click': {
-					if (coordinate) {
-						await mouse.setPosition(new Point(coordinate[0], coordinate[1]));
+					if (scaledCoordinate) {
+						await mouse.setPosition(new Point(scaledCoordinate[0], scaledCoordinate[1]));
 					}
 
 					await mouse.leftClick();
@@ -131,19 +180,19 @@ export function registerComputer(server: McpServer): void {
 				}
 
 				case 'left_click_drag': {
-					if (!coordinate) {
+					if (!scaledCoordinate) {
 						throw new Error('Coordinate required for left_click_drag');
 					}
 
 					await mouse.pressButton(Button.LEFT);
-					await mouse.setPosition(new Point(coordinate[0], coordinate[1]));
+					await mouse.setPosition(new Point(scaledCoordinate[0], scaledCoordinate[1]));
 					await mouse.releaseButton(Button.LEFT);
 					return jsonResult({ok: true});
 				}
 
 				case 'right_click': {
-					if (coordinate) {
-						await mouse.setPosition(new Point(coordinate[0], coordinate[1]));
+					if (scaledCoordinate) {
+						await mouse.setPosition(new Point(scaledCoordinate[0], scaledCoordinate[1]));
 					}
 
 					await mouse.rightClick();
@@ -151,8 +200,8 @@ export function registerComputer(server: McpServer): void {
 				}
 
 				case 'middle_click': {
-					if (coordinate) {
-						await mouse.setPosition(new Point(coordinate[0], coordinate[1]));
+					if (scaledCoordinate) {
+						await mouse.setPosition(new Point(scaledCoordinate[0], scaledCoordinate[1]));
 					}
 
 					await mouse.click(Button.MIDDLE);
@@ -160,8 +209,8 @@ export function registerComputer(server: McpServer): void {
 				}
 
 				case 'double_click': {
-					if (coordinate) {
-						await mouse.setPosition(new Point(coordinate[0], coordinate[1]));
+					if (scaledCoordinate) {
+						await mouse.setPosition(new Point(scaledCoordinate[0], scaledCoordinate[1]));
 					}
 
 					await mouse.doubleClick(Button.LEFT);
@@ -172,33 +221,26 @@ export function registerComputer(server: McpServer): void {
 					// Wait a bit to let things load before showing it to Claude
 					await setTimeout(1000);
 
-					// Get logical screen dimensions (what mouse coordinates use)
-					const logicalWidth = await screen.width();
-					const logicalHeight = await screen.height();
-
 					// Get cursor position in logical coordinates
 					const cursorPos = await mouse.getPosition();
 
 					// Capture the entire screen (may be at Retina resolution)
 					const image = imageToJimp(await screen.grab());
-					const [capturedWidth, capturedHeight] = [image.getWidth(), image.getHeight()];
 
-					// Calculate scale from captured to logical (for cursor positioning)
-					const captureToLogicalScale = logicalWidth / capturedWidth;
-
-					// Resize if high definition, to fit size limits
-					let imageScaleFactor = 1;
-					if (capturedWidth * capturedHeight > 1366 * 768) {
-						imageScaleFactor = Math.sqrt((1366 * 768) / (capturedWidth * capturedHeight));
-						const newWidth = Math.floor(capturedWidth * imageScaleFactor);
-						const newHeight = Math.floor(capturedHeight * imageScaleFactor);
-						image.resize(newWidth, newHeight);
+					// Then resize to fit within API limits
+					const apiScaleFactor = getSizeToApiScale(image.getWidth(), image.getHeight());
+					if (apiScaleFactor < 1) {
+						image.resize(
+							Math.floor(image.getWidth() * apiScaleFactor),
+							Math.floor(image.getHeight() * apiScaleFactor),
+						);
 					}
 
-					// Calculate cursor position in the resized image coordinates
-					// cursor logical -> cursor in captured -> cursor in resized image
-					const cursorInImageX = Math.floor((cursorPos.x / captureToLogicalScale) * imageScaleFactor);
-					const cursorInImageY = Math.floor((cursorPos.y / captureToLogicalScale) * imageScaleFactor);
+					// Calculate cursor position in API image coordinates
+					// cursor is in logical coords, need to convert to API image coords
+					const scale = await getApiToLogicalScale();
+					const cursorInImageX = Math.floor(cursorPos.x / scale);
+					const cursorInImageY = Math.floor(cursorPos.y / scale);
 
 					// Draw a crosshair at cursor position (red color)
 					const crosshairSize = 20;
@@ -252,9 +294,10 @@ export function registerComputer(server: McpServer): void {
 							{
 								type: 'text',
 								text: JSON.stringify({
-									// Report logical dimensions - these match mouse coordinate space
-									display_width_px: logicalWidth,
-									display_height_px: logicalHeight,
+									// Report the image dimensions - Claude should use coordinates within this space
+									// These may differ from the actual display due to scaling for API limits
+									image_width: imageWidth,
+									image_height: imageHeight,
 								}),
 							},
 							{
