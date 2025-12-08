@@ -1,35 +1,14 @@
-#!/usr/bin/env node
-import {execSync} from 'node:child_process';
-import {dirname} from 'node:path';
-import {fileURLToPath} from 'node:url';
+// Library exports for programmatic usage
+import {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js';
+import {registerAll} from './tools/index.js';
 
-// Clear macOS quarantine attributes from native binaries before importing them
-// This is needed for MCPB packages downloaded from the internet
-if (process.platform === 'darwin') {
-	try {
-		const projectRoot = dirname(dirname(fileURLToPath(import.meta.url)));
-		execSync(`xattr -cr "${projectRoot}/node_modules"`, {stdio: 'ignore'});
-	} catch {
-		// Ignore errors - xattr may not exist or may fail on some files
-	}
+export function createServer(): McpServer {
+	const server = new McpServer({
+		name: 'computer-use-mcp',
+		version: '1.0.0',
+	});
+
+	registerAll(server);
+
+	return server;
 }
-
-import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js';
-import {server} from './server.js';
-
-// Start the server
-async function main(): Promise<void> {
-	try {
-		const transport = new StdioServerTransport();
-		await server.connect(transport);
-		console.error('Computer Use MCP server running on stdio');
-	} catch (error) {
-		console.error('Failed to start server:', error);
-		process.exit(1);
-	}
-}
-
-main().catch((error: unknown) => {
-	console.error('Server startup failed:', error);
-	process.exit(1);
-});

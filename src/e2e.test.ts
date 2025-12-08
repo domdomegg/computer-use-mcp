@@ -12,7 +12,7 @@ import {execSync, spawn} from 'node:child_process';
 import {existsSync} from 'node:fs';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import {server} from './server.js';
+import {createServer} from './index.js';
 
 type MCPClient = {
 	sendRequest: <T>(message: JSONRPCRequest) => Promise<T>;
@@ -102,6 +102,7 @@ describe.each([
 		name: 'InMemory Transport',
 		condition: true,
 		async createClient(): Promise<MCPClient> {
+			const server = createServer();
 			const [serverTransport, clientTransport] = InMemoryTransport.createLinkedPair();
 			await server.connect(serverTransport);
 

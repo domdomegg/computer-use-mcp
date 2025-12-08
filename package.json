@@ -9,15 +9,16 @@
     "url": "https://github.com/domdomegg/computer-use-mcp.git"
   },
   "type": "module",
-  "main": "dist/index.js",
+  "main": "dist/main.js",
   "types": "dist/index.d.ts",
-  "bin": "dist/index.js",
+  "bin": "dist/main.js",
   "files": [
     "dist"
   ],
   "mcpName": "io.github.domdomegg/computer-use-mcp",
   "scripts": {
-    "start": "npm run build && node dist/index.js",
+    "start": "npm run build && node dist/main.js",
+    "start:http": "npm run build && MCP_TRANSPORT=http node dist/main.js",
     "test": "vitest run",
     "test:watch": "vitest --watch",
     "test:e2e": "vitest run --config vitest.e2e.config.ts",
@@ -30,11 +31,13 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.24.3",
     "@nut-tree-fork/nut-js": "^4.2.6",
+    "express": "^5.1.0",
     "sharp": "^0.34.5",
     "zod": "^4.1.13"
   },
   "devDependencies": {
     "@tsconfig/node-lts": "^24.0.0",
+    "@types/express": "^5.0.6",
     "@types/node": "^24.10.1",
     "eslint": "^9.39.1",
     "eslint-config-domdomegg": "^2.0.9",
