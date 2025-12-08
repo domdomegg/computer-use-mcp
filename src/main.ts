@@ -41,15 +41,6 @@ if (transport === 'stdio') {
 		await httpTransport.handleRequest(req, res, req.body);
 	});
 
-	const handleSessionRequest = (_req: express.Request, res: express.Response) => {
-		res.status(405).set('Allow', 'POST').json({error: 'Method Not Allowed'});
-	};
-
-	app.get('/mcp', handleSessionRequest);
-	app.put('/mcp', handleSessionRequest);
-	app.patch('/mcp', handleSessionRequest);
-	app.delete('/mcp', handleSessionRequest);
-
 	const server = createServer();
 	await server.connect(httpTransport);
 
