@@ -72,11 +72,11 @@ const actionDescription = `The action to perform. The available actions are:
 * type: Type a string of text on the keyboard.
 * get_cursor_position: Get the current (x, y) pixel coordinate of the cursor on the screen.
 * mouse_move: Move the cursor to a specified (x, y) pixel coordinate on the screen.
-* left_click: Click the left mouse button.
+* left_click: Click the left mouse button. If coordinate is provided, moves to that position first.
 * left_click_drag: Click and drag the cursor to a specified (x, y) pixel coordinate on the screen.
-* right_click: Click the right mouse button.
-* middle_click: Click the middle mouse button.
-* double_click: Double-click the left mouse button.
+* right_click: Click the right mouse button. If coordinate is provided, moves to that position first.
+* middle_click: Click the middle mouse button. If coordinate is provided, moves to that position first.
+* double_click: Double-click the left mouse button. If coordinate is provided, moves to that position first.
 * get_screenshot: Take a screenshot of the screen.`;
 
 const toolDescription = `Use a mouse and keyboard to interact with a computer, and take screenshots.
