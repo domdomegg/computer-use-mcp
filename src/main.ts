@@ -17,7 +17,7 @@ if (process.platform === 'darwin') {
 import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js';
 import {StreamableHTTPServerTransport} from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import express from 'express';
-import {createServer} from './server.js';
+import {createServer} from './index.js';
 import {setupSignalHandlers} from './transports/shared.js';
 
 const transport = process.env.MCP_TRANSPORT || 'stdio';
