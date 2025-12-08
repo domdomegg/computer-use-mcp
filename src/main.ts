@@ -18,7 +18,17 @@ import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js';
 import {StreamableHTTPServerTransport} from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import express from 'express';
 import {createServer} from './index.js';
-import {setupSignalHandlers} from './transports/shared.js';
+
+function setupSignalHandlers(cleanup: () => Promise<void>): void {
+	process.on('SIGINT', async () => {
+		await cleanup();
+		process.exit(0);
+	});
+	process.on('SIGTERM', async () => {
+		await cleanup();
+		process.exit(0);
+	});
+}
 
 const transport = process.env.MCP_TRANSPORT || 'stdio';
 
@@ -35,6 +45,7 @@ if (transport === 'stdio') {
 
 	const httpTransport = new StreamableHTTPServerTransport({
 		sessionIdGenerator: undefined,
+		enableJsonResponse: true,
 	});
 
 	app.post('/mcp', async (req, res) => {
