@@ -11,6 +11,7 @@ import {
 import {setTimeout} from 'node:timers/promises';
 import sharp from 'sharp';
 import {toKeys} from '../xdotoolStringToKeys.js';
+import {jsonResult} from '../utils/response.js';
 
 // Configure nut-js
 mouse.config.autoDelayMs = 100;
@@ -94,9 +95,7 @@ export function registerComputer(server: McpServer): void {
 					await keyboard.pressKey(...keys);
 					await keyboard.releaseKey(...keys);
 
-					return {
-						content: [{type: 'text', text: `Pressed key: ${text}`}],
-					};
+					return jsonResult({ok: true});
 				}
 
 				case 'type': {
@@ -105,16 +104,12 @@ export function registerComputer(server: McpServer): void {
 					}
 
 					await keyboard.type(text);
-					return {
-						content: [{type: 'text', text: `Typed text: ${text}`}],
-					};
+					return jsonResult({ok: true});
 				}
 
 				case 'get_cursor_position': {
 					const pos = await mouse.getPosition();
-					return {
-						content: [{type: 'text', text: JSON.stringify({x: pos.x, y: pos.y})}],
-					};
+					return jsonResult({x: pos.x, y: pos.y});
 				}
 
 				case 'mouse_move': {
@@ -123,9 +118,7 @@ export function registerComputer(server: McpServer): void {
 					}
 
 					await mouse.setPosition(new Point(coordinate[0], coordinate[1]));
-					return {
-						content: [{type: 'text', text: `Moved cursor to: (${coordinate[0]}, ${coordinate[1]})`}],
-					};
+					return jsonResult({ok: true});
 				}
 
 				case 'left_click': {
@@ -134,9 +127,7 @@ export function registerComputer(server: McpServer): void {
 					}
 
 					await mouse.leftClick();
-					return {
-						content: [{type: 'text', text: 'Left clicked'}],
-					};
+					return jsonResult({ok: true});
 				}
 
 				case 'left_click_drag': {
@@ -147,9 +138,7 @@ export function registerComputer(server: McpServer): void {
 					await mouse.pressButton(Button.LEFT);
 					await mouse.setPosition(new Point(coordinate[0], coordinate[1]));
 					await mouse.releaseButton(Button.LEFT);
-					return {
-						content: [{type: 'text', text: `Dragged to: (${coordinate[0]}, ${coordinate[1]})`}],
-					};
+					return jsonResult({ok: true});
 				}
 
 				case 'right_click': {
@@ -158,9 +147,7 @@ export function registerComputer(server: McpServer): void {
 					}
 
 					await mouse.rightClick();
-					return {
-						content: [{type: 'text', text: 'Right clicked'}],
-					};
+					return jsonResult({ok: true});
 				}
 
 				case 'middle_click': {
@@ -169,9 +156,7 @@ export function registerComputer(server: McpServer): void {
 					}
 
 					await mouse.click(Button.MIDDLE);
-					return {
-						content: [{type: 'text', text: 'Middle clicked'}],
-					};
+					return jsonResult({ok: true});
 				}
 
 				case 'double_click': {
@@ -180,9 +165,7 @@ export function registerComputer(server: McpServer): void {
 					}
 
 					await mouse.doubleClick(Button.LEFT);
-					return {
-						content: [{type: 'text', text: 'Double clicked'}],
-					};
+					return jsonResult({ok: true});
 				}
 
 				case 'get_screenshot': {
