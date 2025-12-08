@@ -21,9 +21,20 @@ This talks to your computer using [nut.js](https://github.com/nut-tree/nut.js).
 
 Follow the instructions below for your preferred client:
 
+- [Claude Code](#claude-code)
 - [Claude Desktop](#claude-desktop)
 - [Cursor](#cursor)
 - [Cline](#cline)
+
+### Claude Code
+
+Run:
+
+```bash
+claude mcp add --scope user --transport stdio computer-use -- npx -y computer-use-mcp
+```
+
+This installs the server at user scope (available in all projects). To install locally (current directory only), omit `--scope user`.
 
 ### Claude Desktop
 
