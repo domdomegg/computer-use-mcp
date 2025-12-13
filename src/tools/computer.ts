@@ -63,6 +63,7 @@ const ActionEnum = z.enum([
 	'right_click',
 	'middle_click',
 	'double_click',
+	'scroll',
 	'get_screenshot',
 	'get_cursor_position',
 ]);
@@ -77,6 +78,7 @@ const actionDescription = `The action to perform. The available actions are:
 * right_click: Click the right mouse button. If coordinate is provided, moves to that position first.
 * middle_click: Click the middle mouse button. If coordinate is provided, moves to that position first.
 * double_click: Double-click the left mouse button. If coordinate is provided, moves to that position first.
+* scroll: Scroll the screen in a specified direction. Requires coordinate (moves there first) and text parameter with direction: "up", "down", "left", or "right". Optionally append ":N" to scroll N pixels (default 300), e.g. "down:500".
 * get_screenshot: Take a screenshot of the screen.`;
 
 const toolDescription = `Use a mouse and keyboard to interact with a computer, and take screenshots.
@@ -214,6 +216,53 @@ export function registerComputer(server: McpServer): void {
 					}
 
 					await mouse.doubleClick(Button.LEFT);
+					return jsonResult({ok: true});
+				}
+
+				case 'scroll': {
+					if (!scaledCoordinate) {
+						throw new Error('Coordinate required for scroll');
+					}
+
+					if (!text) {
+						throw new Error('Text required for scroll (direction like "up", "down:5")');
+					}
+
+					// Parse direction and optional amount from text (e.g. "down" or "down:5")
+					const parts = text.split(':');
+					const direction = parts[0];
+					const amountStr = parts[1];
+					const amount = amountStr ? parseInt(amountStr, 10) : 300;
+
+					if (!direction) {
+						throw new Error('Scroll direction required');
+					}
+
+					if (amountStr !== undefined && (isNaN(amount) || amount <= 0)) {
+						throw new Error(`Invalid scroll amount: ${amountStr}`);
+					}
+
+					// Move to position first
+					await mouse.setPosition(new Point(scaledCoordinate[0], scaledCoordinate[1]));
+
+					// Scroll in the specified direction
+					switch (direction.toLowerCase()) {
+						case 'up':
+							await mouse.scrollUp(amount);
+							break;
+						case 'down':
+							await mouse.scrollDown(amount);
+							break;
+						case 'left':
+							await mouse.scrollLeft(amount);
+							break;
+						case 'right':
+							await mouse.scrollRight(amount);
+							break;
+						default:
+							throw new Error(`Invalid scroll direction: ${direction}. Use "up", "down", "left", or "right"`);
+					}
+
 					return jsonResult({ok: true});
 				}
 
