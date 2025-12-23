@@ -2,7 +2,9 @@
 
 💻 An model context protocol server for Claude to control your computer. This is very similar to [computer use](https://docs.anthropic.com/en/docs/build-with-claude/computer-use), but easy to set up and use locally.
 
-<!-- TODO: demo video -->
+Here's Claude Haiku 4.5 changing my desktop background (4x speed):
+
+https://github.com/user-attachments/assets/cd0bc190-52c4-49db-b3bc-4b8a74544789
 
 > [!WARNING]
 > At time of writing, models make frequent mistakes and are vulnerable to prompt injections. As this MCP server gives the model complete control of your computer, this could do a lot of damage. You should therefore treat this like giving a hyperactive toddler access to your computer - you probably want to supervise it closely, and consider only doing this in a sandboxed user account.
