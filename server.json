@@ -1,5 +1,5 @@
 {
-  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-10-17/server.schema.json",
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.domdomegg/computer-use-mcp",
   "title": "Computer Use",
   "description": "Control your computer with screenshots, mouse, and keyboard automation.",
