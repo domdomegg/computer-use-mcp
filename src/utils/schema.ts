@@ -13,7 +13,7 @@ export function strictSchemaWithAliases<T extends ZodRawShape>(
 ): z.ZodType {
 	const objectSchema = z.object(shape).strict();
 
-	return z.preprocess((args: unknown) => {
+	const effectsSchema = z.preprocess((args: unknown) => {
 		if (typeof args !== 'object' || args === null) {
 			return args;
 		}
@@ -32,4 +32,10 @@ export function strictSchemaWithAliases<T extends ZodRawShape>(
 
 		return result;
 	}, objectSchema);
+
+	// Expose .shape so MCP SDK's normalizeObjectSchema can find the inner schema.
+	// Without this, the SDK falls back to an empty JSON schema for ZodEffects.
+	(effectsSchema as unknown as {shape: T}).shape = objectSchema.shape;
+
+	return effectsSchema;
 }
