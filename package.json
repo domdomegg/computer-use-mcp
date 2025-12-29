@@ -1,6 +1,6 @@
 {
   "name": "computer-use-mcp",
-  "version": "1.6.1",
+  "version": "1.6.2",
   "description": "💻 MCP server for Claude to control your computer",
   "license": "MIT",
   "author": "Adam Jones (domdomegg)",
