@@ -12,7 +12,6 @@ import {setTimeout} from 'node:timers/promises';
 import sharp from 'sharp';
 import {toKeys} from '../xdotoolStringToKeys.js';
 import {jsonResult} from '../utils/response.js';
-import {strictSchemaWithAliases} from '../utils/schema.js';
 
 // Configure nut-js
 mouse.config.autoDelayMs = 100;
@@ -102,14 +101,11 @@ export function registerComputer(server: McpServer): void {
 		{
 			title: 'Computer Control',
 			description: toolDescription,
-			inputSchema: strictSchemaWithAliases(
-				{
-					action: ActionEnum.describe(actionDescription),
-					coordinate: z.tuple([z.number(), z.number()]).optional().describe('(x, y): The x (pixels from the left edge) and y (pixels from the top edge) coordinates'),
-					text: z.string().optional().describe('Text to type or key command to execute'),
-				},
-				{},
-			),
+			inputSchema: z.object({
+				action: ActionEnum.describe(actionDescription),
+				coordinate: z.tuple([z.number(), z.number()]).optional().describe('(x, y): The x (pixels from the left edge) and y (pixels from the top edge) coordinates'),
+				text: z.string().optional().describe('Text to type or key command to execute'),
+			}).strict(),
 			// Note: No outputSchema because this tool returns varying content types including images
 			annotations: {
 				readOnlyHint: false,
