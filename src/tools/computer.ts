@@ -8,6 +8,7 @@ import {
 	Button,
 	imageToJimp,
 } from '@nut-tree-fork/nut-js';
+import {execFileSync} from 'node:child_process';
 import {setTimeout} from 'node:timers/promises';
 import sharp from 'sharp';
 import {toKeys} from '../xdotoolStringToKeys.js';
@@ -17,6 +18,46 @@ import {jsonResult} from '../utils/response.js';
 mouse.config.autoDelayMs = 100;
 mouse.config.mouseSpeed = 1000;
 keyboard.config.autoDelayMs = 10;
+
+/**
+ * Check if xdotool is available on this system.
+ * Cached after first check.
+ */
+let xdotoolAvailable: boolean | undefined;
+function hasXdotool(): boolean {
+	if (xdotoolAvailable === undefined) {
+		try {
+			execFileSync('which', ['xdotool'], {stdio: 'ignore'});
+			xdotoolAvailable = true;
+		} catch {
+			xdotoolAvailable = false;
+		}
+	}
+
+	return xdotoolAvailable;
+}
+
+/**
+ * Type text using xdotool, which correctly respects the X11 keyboard layout.
+ *
+ * nut-js's keyboard.type() uses libnut's typeString which maps characters to
+ * X keycodes using a hardcoded US QWERTY lookup. This breaks when the X server's
+ * keyboard layout differs, causing characters like : and ; to be swapped.
+ * xdotool type uses XSendEvent with proper keymap lookups, so it works regardless
+ * of the active keyboard layout.
+ */
+function xdotoolType(text: string): void {
+	execFileSync('xdotool', [
+		'type',
+		'--clearmodifiers',
+		'--delay',
+		String(keyboard.config.autoDelayMs),
+		'--',
+		text,
+	], {
+		env: {...process.env, DISPLAY: process.env.DISPLAY || ':1'},
+	});
+}
 
 // The Claude API automatically downsamples images larger than ~1.15MP or 1568px on the long edge.
 // We already downsampled screenshots to fit these limits and reported the original screen
@@ -150,7 +191,12 @@ export function registerComputer(server: McpServer): void {
 						throw new Error('Text required for type');
 					}
 
-					await keyboard.type(text);
+					if (process.platform === 'linux' && hasXdotool()) {
+						xdotoolType(text);
+					} else {
+						await keyboard.type(text);
+					}
+
 					return jsonResult({ok: true});
 				}
 
