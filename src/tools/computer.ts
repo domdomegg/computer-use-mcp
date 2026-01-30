@@ -50,8 +50,10 @@ function xdotoolType(text: string): void {
 	execFileSync('xdotool', [
 		'type',
 		'--clearmodifiers',
-		'--delay', String(keyboard.config.autoDelayMs),
-		'--', text,
+		'--delay',
+		String(keyboard.config.autoDelayMs),
+		'--',
+		text,
 	], {
 		env: {...process.env, DISPLAY: process.env.DISPLAY || ':1'},
 	});
