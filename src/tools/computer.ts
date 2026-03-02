@@ -9,10 +9,38 @@ import {
 	imageToJimp,
 } from '@nut-tree-fork/nut-js';
 import {execFileSync} from 'node:child_process';
+import {readFileSync, unlinkSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
 import {setTimeout} from 'node:timers/promises';
+import Jimp from 'jimp';
 import sharp from 'sharp';
 import {toKeys} from '../xdotoolStringToKeys.js';
 import {jsonResult} from '../utils/response.js';
+
+/**
+ * Grab the screen, falling back to the macOS `screencapture` CLI if nut-js fails
+ * (e.g. on macOS 26+ where CGDisplayCreateImageForRect was removed).
+ */
+async function grabScreen(): Promise<ReturnType<typeof imageToJimp>> {
+	try {
+		return imageToJimp(await screen.grab());
+	} catch {
+		// Fallback: use screencapture CLI (macOS only)
+		const tmpPath = join(tmpdir(), `computer-use-mcp-${Date.now()}.png`);
+		try {
+			execFileSync('screencapture', ['-x', tmpPath]);
+			const buffer = readFileSync(tmpPath);
+			return (await Jimp.read(buffer)) as unknown as ReturnType<typeof imageToJimp>;
+		} finally {
+			try {
+				unlinkSync(tmpPath);
+			} catch {
+				/* ignore cleanup errors */
+			}
+		}
+	}
+}
 
 // Configure nut-js
 mouse.config.autoDelayMs = 100;
@@ -322,7 +350,7 @@ export function registerComputer(server: McpServer): void {
 					const cursorPos = await mouse.getPosition();
 
 					// Capture the entire screen (may be at Retina resolution)
-					const image = imageToJimp(await screen.grab());
+					const image = await grabScreen();
 
 					// Then resize to fit within API limits
 					const apiScaleFactor = getSizeToApiScale(image.getWidth(), image.getHeight());
