@@ -169,39 +169,6 @@ const coordinateSchema = z
 	.length(2)
 	.describe('(x, y): The x (pixels from the left edge) and y (pixels from the top edge) coordinates');
 
-export function getComputerToolDefinition() {
-	return {
-		name: 'computer',
-		title: 'Computer Control',
-		description: toolDescription,
-		inputSchema: {
-			type: 'object',
-			properties: {
-				action: {
-					type: 'string',
-					description: actionDescription,
-					enum: ActionEnum.options,
-				},
-				coordinate: {
-					type: 'array',
-					description: '(x, y): The x (pixels from the left edge) and y (pixels from the top edge) coordinates',
-					items: {
-						type: 'number',
-					},
-					minItems: 2,
-					maxItems: 2,
-				},
-				text: {
-					type: 'string',
-					description: 'Text to type or key command to execute',
-				},
-			},
-			required: ['action'],
-			additionalProperties: false,
-		},
-	};
-}
-
 export function registerComputer(server: McpServer): void {
 	server.registerTool(
 		'computer',
