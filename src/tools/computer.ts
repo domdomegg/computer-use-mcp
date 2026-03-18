@@ -164,6 +164,44 @@ Using the crosshair:
 * After clicking, check where the crosshair appears vs your target. If it missed, adjust coordinates proportionally to the distance - start with large adjustments and refine. Avoid small incremental changes when the crosshair is far from the target (distances are often further than you expect).
 * Consider display dimensions when estimating positions. E.g. if it's 90% to the bottom of the screen, the coordinates should reflect this.`;
 
+const coordinateSchema = z
+	.array(z.number())
+	.length(2)
+	.describe('(x, y): The x (pixels from the left edge) and y (pixels from the top edge) coordinates');
+
+export function getComputerToolDefinition() {
+	return {
+		name: 'computer',
+		title: 'Computer Control',
+		description: toolDescription,
+		inputSchema: {
+			type: 'object',
+			properties: {
+				action: {
+					type: 'string',
+					description: actionDescription,
+					enum: ActionEnum.options,
+				},
+				coordinate: {
+					type: 'array',
+					description: '(x, y): The x (pixels from the left edge) and y (pixels from the top edge) coordinates',
+					items: {
+						type: 'number',
+					},
+					minItems: 2,
+					maxItems: 2,
+				},
+				text: {
+					type: 'string',
+					description: 'Text to type or key command to execute',
+				},
+			},
+			required: ['action'],
+			additionalProperties: false,
+		},
+	};
+}
+
 export function registerComputer(server: McpServer): void {
 	server.registerTool(
 		'computer',
@@ -172,7 +210,7 @@ export function registerComputer(server: McpServer): void {
 			description: toolDescription,
 			inputSchema: z.object({
 				action: ActionEnum.describe(actionDescription),
-				coordinate: z.tuple([z.number(), z.number()]).optional().describe('(x, y): The x (pixels from the left edge) and y (pixels from the top edge) coordinates'),
+				coordinate: coordinateSchema.optional(),
 				text: z.string().optional().describe('Text to type or key command to execute'),
 			}).strict(),
 			// Note: No outputSchema because this tool returns varying content types including images
