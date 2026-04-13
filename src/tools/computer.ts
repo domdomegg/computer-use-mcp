@@ -159,6 +159,9 @@ const toolDescription = `Use a mouse and keyboard to interact with a computer, a
 * If you tried clicking on a program or link but it failed to load, even after waiting, try adjusting your cursor position so that the tip of the cursor visually falls on the element that you want to click.
 * Make sure to click any buttons, links, icons, etc with the cursor tip in the center of the element. Don't click boxes on their edges unless asked.
 
+Window focus:
+* On macOS, clicking on a window that is not focused (e.g. behind another application) may only bring that window to the front without triggering the actual click on the element. If your click doesn't seem to have had an effect, take a screenshot to verify and click again — the window should now be focused and the second click will register.
+
 Using the crosshair:
 * Screenshots show a red crosshair at the current cursor position.
 * After clicking, check where the crosshair appears vs your target. If it missed, adjust coordinates proportionally to the distance - start with large adjustments and refine. Avoid small incremental changes when the crosshair is far from the target (distances are often further than you expect).
