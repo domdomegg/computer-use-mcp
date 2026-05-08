@@ -27,12 +27,12 @@ This installs the server at user scope (available in all projects). To install l
 <details>
 <summary><strong>Claude Desktop</strong></summary>
 
-#### (Recommended) Via manual .dxt installation
+#### (Recommended) Via manual .mcpb installation
 
-1. Find the latest dxt build in [the GitHub Actions history](https://github.com/domdomegg/computer-use-mcp/actions/workflows/ci.yaml?query=branch%3Amaster) (the top one)
-2. In the 'Artifacts' section, download the `computer-use-mcp-dxt` file
-3. Rename the `.zip` file to `.dxt`
-4. Double-click the `.dxt` file to open with Claude Desktop
+1. Find the latest mcpb build in [the GitHub Actions history](https://github.com/domdomegg/computer-use-mcp/actions/workflows/ci.yaml?query=branch%3Amaster) (the top one)
+2. In the 'Artifacts' section, download the `computer-use-mcp-mcpb` file
+3. Rename the `.zip` file to `.mcpb`
+4. Double-click the `.mcpb` file to open with Claude Desktop
 5. Click "Install"
 
 #### (Advanced) Alternative: Via JSON configuration
