@@ -135,21 +135,21 @@ describe.each([
 		},
 	},
 	{
-		name: 'DXT Package',
-		condition: process.env.RUN_DXT_TEST,
+		name: 'MCP Bundle',
+		condition: process.env.RUN_MCPB_TEST,
 		async createClient(): Promise<MCPClient> {
-			// Build DXT package if it doesn't exist
-			if (!existsSync('computer-use-mcp.dxt')) {
-				execSync('./build-dxt.sh', {stdio: 'inherit'});
+			// Build MCP Bundle if it doesn't exist
+			if (!existsSync('computer-use-mcp.mcpb')) {
+				execSync('./build-mcpb.sh', {stdio: 'inherit'});
 			}
 
-			// Extract DXT package to test directory
-			const testDir = 'test-dxt-client';
+			// Extract MCP Bundle to test directory
+			const testDir = 'test-mcpb-client';
 			execSync(`rm -rf ${testDir}`);
-			execSync(`mkdir -p ${testDir} && unzip -q computer-use-mcp.dxt -d ${testDir}`);
+			execSync(`mkdir -p ${testDir} && unzip -q computer-use-mcp.mcpb -d ${testDir}`);
 
-			// Start the MCP server from the extracted DXT package
-			const serverProcess = spawn('node', [path.join(testDir, 'dist/index.js')], {
+			// Start the MCP server from the extracted MCP Bundle
+			const serverProcess = spawn('node', [path.join(testDir, 'dist/main.js')], {
 				stdio: ['pipe', 'pipe', 'pipe'],
 				env: {...process.env},
 			});
