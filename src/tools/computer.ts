@@ -12,7 +12,6 @@ import {execFileSync} from 'node:child_process';
 import {readFileSync, unlinkSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
-import {setTimeout} from 'node:timers/promises';
 import Jimp from 'jimp';
 import sharp from 'sharp';
 import {toKeys} from '../xdotoolStringToKeys.js';
@@ -351,9 +350,6 @@ export function registerComputer(server: McpServer): void {
 				}
 
 				case 'get_screenshot': {
-					// Wait a bit to let things load before showing it to Claude
-					await setTimeout(1000);
-
 					// Get cursor position in logical coordinates
 					const cursorPos = await mouse.getPosition();
 
