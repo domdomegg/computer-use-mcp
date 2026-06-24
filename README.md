@@ -11,9 +11,15 @@ https://github.com/user-attachments/assets/cd0bc190-52c4-49db-b3bc-4b8a74544789
 
 ## Installation
 
-[**Install for your client →**](https://adamjones.me/install-mcp/?config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsImNvbXB1dGVyLXVzZS1tY3AiXSwibmFtZSI6ImNvbXB1dGVyLXVzZSJ9)
+For most clients (Claude Code, Cursor, Cline, VS Code, and more), follow the up-to-date instructions on [install-mcp](https://adamjones.me/install-mcp/?config=eyJjb21tYW5kIjoibnB4IiwiYXJncyI6WyIteSIsImNvbXB1dGVyLXVzZS1tY3AiXSwibmFtZSI6ImNvbXB1dGVyLXVzZSJ9), which generates the right config for your client.
 
-Pick your MCP client (Claude Code, Claude Desktop, Cursor, Cline, and more) for up-to-date, copy-paste install instructions.
+For Claude Desktop, install the `.mcpb` bundle:
+
+1. Find the latest mcpb build in [the GitHub Actions history](https://github.com/domdomegg/computer-use-mcp/actions/workflows/ci.yaml?query=branch%3Amaster) (the top one)
+2. In the 'Artifacts' section, download the `computer-use-mcp-mcpb` file
+3. Rename the `.zip` file to `.mcpb`
+4. Double-click the `.mcpb` file to open with Claude Desktop
+5. Click "Install"
 
 ## Tips
 
