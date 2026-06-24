@@ -15,7 +15,7 @@ import {join} from 'node:path';
 import {setTimeout} from 'node:timers/promises';
 import Jimp from 'jimp';
 import sharp from 'sharp';
-import {toKeys} from '../xdotoolStringToKeys.js';
+import {toKeys} from '../utils/xdotoolStringToKeys.js';
 import {jsonResult} from '../utils/response.js';
 
 /**
