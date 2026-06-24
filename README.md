@@ -1,6 +1,6 @@
 # computer-use-mcp
 
-💻 An model context protocol server for Claude to control your computer. This is very similar to [computer use](https://docs.anthropic.com/en/docs/build-with-claude/computer-use), but easy to set up and use locally.
+💻 A Model Context Protocol server for Claude to control your computer. This is very similar to [computer use](https://docs.anthropic.com/en/docs/build-with-claude/computer-use), but easy to set up and use locally.
 
 Here's Claude Haiku 4.5 changing my desktop background (4x speed):
 
