@@ -32,7 +32,7 @@
     "@modelcontextprotocol/sdk": "^1.24.3",
     "@nut-tree-fork/nut-js": "^4.2.6",
     "express": "^5.1.0",
-    "sharp": "^0.34.5",
+    "sharp": "^0.35.3",
     "zod": "^4.1.13"
   },
   "devDependencies": {
