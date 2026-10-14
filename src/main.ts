@@ -16,6 +16,7 @@ if (process.platform === 'darwin') {
 
 import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js';
 import {StreamableHTTPServerTransport} from '@modelcontextprotocol/sdk/server/streamableHttp.js';
+import type {Transport} from '@modelcontextprotocol/sdk/shared/transport.js';
 import express from 'express';
 import {createServer} from './index.js';
 
@@ -38,7 +39,7 @@ function setupSignalHandlers(cleanup: () => Promise<void>): void {
 		setupSignalHandlers(async () => server.close());
 
 		const stdioTransport = new StdioServerTransport();
-		await server.connect(stdioTransport);
+		await server.connect(stdioTransport as Transport);
 		console.error('Computer Use MCP server running on stdio');
 	} else if (transport === 'http') {
 		const app = express();
@@ -48,13 +49,12 @@ function setupSignalHandlers(cleanup: () => Promise<void>): void {
 		app.post('/mcp', async (req, res) => {
 			const server = createServer();
 			const httpTransport = new StreamableHTTPServerTransport({
-				sessionIdGenerator: undefined,
 				enableJsonResponse: true,
 			});
 			res.on('close', () => {
 				void server.close();
 			});
-			await server.connect(httpTransport);
+			await server.connect(httpTransport as Transport);
 			await httpTransport.handleRequest(req, res, req.body);
 		});
 
